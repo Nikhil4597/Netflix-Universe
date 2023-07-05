@@ -21,6 +21,23 @@ class HomeViewController: UIViewController {
         
         homeFeedTable.delegate = self
         homeFeedTable.dataSource = self
+        
+        configureNavBar()
+        
+        homeFeedTable.tableHeaderView = HeroHeadUIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
+    }
+    
+    private func configureNavBar() {
+            var img = UIImage(named: "netflixLogo")
+        img = img?.withRenderingMode(.alwaysOriginal)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: img, style: .done, target: self, action: nil)
+        
+        navigationItem.rightBarButtonItems = [
+            UIBarButtonItem(image: UIImage(systemName: "person"), style: .done, target: self, action: nil),
+            UIBarButtonItem(image: UIImage(systemName: "play"), style: .done, target: self, action: nil)
+        ]
+        
+        navigationController?.navigationBar.tintColor = .black
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -54,5 +71,10 @@ extension HomeViewController: UITableViewDelegate,UITableViewDataSource {
         return cell
     }
     
-    
+    // safe scroll
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let defaultOffset = view.safeAreaInsets.top
+        let offset = scrollView.contentOffset.y + defaultOffset
+        navigationController?.navigationBar.transform = .init(translationX: 0, y: min(0, -offset))
+    }
 }
