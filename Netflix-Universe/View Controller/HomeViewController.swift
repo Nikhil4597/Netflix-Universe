@@ -8,6 +8,7 @@
 import UIKit
 
 class HomeViewController: UIViewController {
+    let  sectionTitles: [String] = ["Tranding Movies", "Trandong Tv", "Popular", "Upcoming Movies", "Top Rated"]
     private let homeFeedTable:UITableView = {
         let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.register(CollectionViewTableViewCell.self, forCellReuseIdentifier: CollectionViewTableViewCell.identifier)
@@ -25,6 +26,12 @@ class HomeViewController: UIViewController {
         configureNavBar()
         
         homeFeedTable.tableHeaderView = HeroHeadUIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
+        
+        getTrandingMovies()
+        getTrandingTV()
+        getUpcomingMovies()
+        getPopularMovies()
+        getTopRatedMovies()
     }
     
     private func configureNavBar() {
@@ -39,6 +46,62 @@ class HomeViewController: UIViewController {
         
         navigationController?.navigationBar.tintColor = .black
     }
+    
+    private func getTrandingMovies() {
+        APICaller.shared.getTradingMovies(completion: { results in
+            switch results {
+            case .success(let trandingMovies):
+                print(trandingMovies.count)
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        })
+    }
+    
+    private func getTrandingTV() {
+        APICaller.shared.getTradingTV(completion: { results in
+            switch results {
+            case .success(let trandingTV):
+                print(trandingTV.count)
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        })
+    }
+    
+    private func getUpcomingMovies() {
+        APICaller.shared.getUpcomingMovies(completion: { results in
+            switch results {
+            case .success(let upcomingMovies):
+                print(upcomingMovies.count)
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        })
+    }
+    
+    private func getPopularMovies() {
+        APICaller.shared.getPopularMovies(completion: { results in
+            switch results {
+            case .success(let popularMovies):
+                print(popularMovies.count)
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        })
+    }
+    
+    private func getTopRatedMovies() {
+        APICaller.shared.getTopRatedMovies(completion: { results in
+            switch results {
+            case .success(let topRatedMovies):
+                print(topRatedMovies.count)
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        })
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         homeFeedTable.frame = view.bounds
@@ -49,7 +112,7 @@ class HomeViewController: UIViewController {
 
 extension HomeViewController: UITableViewDelegate,UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 20
+        return sectionTitles.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -61,7 +124,7 @@ extension HomeViewController: UITableViewDelegate,UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 20
+        return 35
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -71,10 +134,22 @@ extension HomeViewController: UITableViewDelegate,UITableViewDataSource {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        guard let header = view as? UITableViewHeaderFooterView else { return }
+        header.textLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
+        header.textLabel?.frame = CGRect(x: header.bounds.origin.x + 20, y: header.bounds.origin.y , width: 100, height: header.bounds.height)
+        header.textLabel?.textColor = .black
+        header.textLabel?.text = header.textLabel?.text?.capitalizeFirstLetter()
+    }
+    
     // safe scroll
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let defaultOffset = view.safeAreaInsets.top
         let offset = scrollView.contentOffset.y + defaultOffset
         navigationController?.navigationBar.transform = .init(translationX: 0, y: min(0, -offset))
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return sectionTitles[section]
     }
 }
